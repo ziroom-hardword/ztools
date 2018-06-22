@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/jquery.min.js"></script>
+    <title>首页</title>
+</head>
+<script type="text/javascript">
+function commit() {
+    var regx=/((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))/
+
+    var ip = $("#ip").val();
+    if(!regx.test(ip)){
+        alert("ip格式不对");
+        return;
+    }
+    var port = $("#port").val()
+    var content = $("#content").val()
+    datastr = JSON.stringify({"ip":ip,"port":port,"content":content})
+    $.ajax({
+        type:"POST",
+        dataType:"json",
+        url:"commit",
+        contentType:"application/json",
+        data:datastr,
+        success:function(data){
+           $("#respcontent").val(data.result);
+        },
+        error:function(data){
+            $("#respcontent").val(data.result);
+        }
+    });
+
+}
+
+</script>
+<body>
+    <h1>测试工具</h1>
+    <table>
+        <tr>
+            <td>IP:</td>
+            <td><input type="text" id = "ip" name = "id"></td>
+        </tr>
+        <tr>
+            <td>PORT:</td>
+            <td><input type="text" id = "port" name = "port"></td>
+        </tr>
+        <tr>
+            <td>内容:</td>
+            <td><textarea rows="10" cols="50" id="content" name="content"></textarea></td>
+        </tr>
+    </table>
+        <input type="button" value="提交" onclick="commit()"> <br>
+        <hr style="height:3px;border:none;border-top:3px double red;" />
+        返回内容: <textarea rows="10" cols="50" id="respcontent" name="respcontend"></textarea>
+
+</body>
+</html>
