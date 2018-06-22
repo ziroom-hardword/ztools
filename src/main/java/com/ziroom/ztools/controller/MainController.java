@@ -35,28 +35,25 @@ public class MainController {
             Integer port = info.getPort();
             String content = info.getContent();
 
-            String s = str2HexStr(content);
+            byte[] s = str2Str(content);
 
             Socket socket = new Socket(ip, port);
-            OutputStream outputStream = socket.getOutputStream();
-            PrintWriter printWriter = new PrintWriter(outputStream);
+            OutputStream os = socket.getOutputStream();
+            os.write(s);
+            os.flush();
 
-            printWriter.write(content);
-            printWriter.flush();
-
-            InputStream inputStream = socket.getInputStream();
+            InputStream is = socket.getInputStream();
             byte[] bytes = new byte[1024];
             int len;
             StringBuilder sb = new StringBuilder();
-            while ((len = inputStream.read(bytes)) != -1) {
+            while ((len = is.read(bytes)) != -1) {
                 //注意指定编码格式，发送方和接收方一定要统一，建议使用UTF-8
                 sb.append(new String(bytes, 0, len, "UTF-8"));
             }
             System.out.println(sb.toString());
             //4、关闭资源
-            inputStream.close();
-            printWriter.close();
-            outputStream.close();
+            is.close();
+            os.close();
             socket.close();
 
 
@@ -71,47 +68,27 @@ public class MainController {
     }
 
     /**
-     * 字符串转换成为16进制(无需Unicode编码)
      *
      * @param str
      * @return
      */
-    public static String str2HexStr(String str) throws Exception {
-        char[] chars = "0123456789ABCDEF".toCharArray();
-        StringBuilder sb = new StringBuilder("");
-
+    public static byte[] str2Str(String str) throws Exception {
         byte[] bs = str.getBytes("utf-8");
-        sb.append(String.format("%04x", (bs.length + 6)));
-        sb.append("0021");
 
-        int bit;
-        for (int i = 0; i < bs.length; i++) {
-            bit = (bs[i] & 0x0f0) >> 4;
-            sb.append(chars[bit]);
-            bit = bs[i] & 0x0f;
-            sb.append(chars[bit]);
-        }
-        sb.append("0000");
-        return sb.toString().trim();
-    }
+        int length = bs.length + 6;
+        byte[] resp= new byte[length];
+        resp[0] = (byte)((length & 0xFF00)>>8);
+        resp[1] =  (byte)(length & 0xFF);
+        resp[2] =  0x00;
+        resp[3] =  0x21;
 
-    /**
-     * 16进制直接转换成为字符串(无需Unicode解码)
-     *
-     * @param hexStr
-     * @return
-     */
-    public static String hexStr2Str(String hexStr) {
-        String str = "0123456789ABCDEF";
-        char[] hexs = hexStr.toCharArray();
-        byte[] bytes = new byte[hexStr.length() / 2];
-        int n;
-        for (int i = 0; i < bytes.length; i++) {
-            n = str.indexOf(hexs[2 * i]) * 16;
-            n += str.indexOf(hexs[2 * i + 1]);
-            bytes[i] = (byte) (n & 0xff);
+        for(int i=0;i<bs.length;i++){
+            resp[4+i] = bs[i];
         }
-        return new String(bytes);
+        resp[length -2] = 0x00;
+        resp[length -1] = 0x00;
+
+        return resp;
     }
 
 }
