@@ -1,17 +1,26 @@
 package com.ziroom.ztools.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.ziroom.ztools.controller.model.DataValue;
+import com.ziroom.ztools.controller.model.JsonData;
 import com.ziroom.ztools.controller.model.NetInfo;
+import com.ziroom.ztools.controller.mqtt.MQTTClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.xml.crypto.Data;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +29,10 @@ import java.util.Map;
  */
 @Controller
 public class MainController {
+
+
+    //@Autowired
+   // private MQTTClient mqttClient;
 
     @RequestMapping("/")
     public String index() {
@@ -33,12 +46,23 @@ public class MainController {
         try {
             String ip = info.getIp();
             Integer port = info.getPort();
-            String content = info.getContent();
+            String ssid = info.getSsid();
+            String password = info.getPassword();
+            JsonData jsonData = new JsonData();
+            List<DataValue> list = new ArrayList<DataValue>();
+            DataValue dv_ssid  = new DataValue("ssid",ssid);
+            list.add(dv_ssid);
+            DataValue dv_password  = new DataValue("password",password);
+            list.add(dv_password);
 
-            byte[] s = str2Str(content);
+            jsonData.setData(list);
 
+            System.out.println(JSON.toJSONString(jsonData));
+            byte[] s = str2Str(JSON.toJSONString(jsonData));
+            System.out.println(ip+"  " +port);
             Socket socket = new Socket(ip, port);
             OutputStream os = socket.getOutputStream();
+            //os.write(content.getBytes("utf-8"));
             os.write(s);
             os.flush();
 
@@ -50,6 +74,7 @@ public class MainController {
                 //注意指定编码格式，发送方和接收方一定要统一，建议使用UTF-8
                 sb.append(new String(bytes, 0, len, "UTF-8"));
             }
+
             System.out.println(sb.toString());
             //4、关闭资源
             is.close();

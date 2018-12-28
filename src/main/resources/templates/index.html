@@ -9,14 +9,11 @@
 function commit() {
     var regx=/((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))/
 
-    var ip = $("#ip").val();
-    if(!regx.test(ip)){
-        alert("ip格式不对");
-        return;
-    }
+    var ip = $("#ip").val()
     var port = $("#port").val()
-    var content = $("#content").val()
-    datastr = JSON.stringify({"ip":ip,"port":port,"content":content})
+    var ssid = $("#ssid").val();
+    var password = $("#password").val()
+    datastr = JSON.stringify({"ip":ip,"port":port,"ssid":ssid,"password":password})
     $.ajax({
         type:"POST",
         dataType:"json",
@@ -39,15 +36,19 @@ function commit() {
     <table>
         <tr>
             <td>IP:</td>
-            <td><input type="text" id = "ip" name = "id"></td>
+            <td><input type="text" id = "ip" name = "id" value="192.168.43.1"></td>
         </tr>
         <tr>
             <td>PORT:</td>
-            <td><input type="text" id = "port" name = "port"></td>
+            <td><input type="text" id = "port" name = "port" value="6666"></td>
         </tr>
         <tr>
-            <td>内容:</td>
-            <td><textarea rows="10" cols="50" id="content" name="content"></textarea></td>
+            <td>SSID:</td>
+            <td><input  id="ssid" name="ssid"></input></td>
+        </tr>
+        <tr>
+            <td>PASSWORD:</td>
+            <td><input id="password" name="password"></input></td>
         </tr>
     </table>
         <input type="button" value="提交" onclick="commit()"> <br>

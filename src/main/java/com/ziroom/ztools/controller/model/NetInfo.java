@@ -7,7 +7,8 @@ package com.ziroom.ztools.controller.model;
 public class NetInfo {
     public String ip;
     public Integer port;
-    public String content;
+    public String ssid;
+    public String password;
 
     public String getIp() {
         return ip;
@@ -25,11 +26,20 @@ public class NetInfo {
         this.port = port;
     }
 
-    public String getContent() {
-        return content;
+    public String getSsid() {
+        return ssid;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }
